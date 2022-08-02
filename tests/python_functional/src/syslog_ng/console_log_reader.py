@@ -67,7 +67,7 @@ class ConsoleLogReader(object):
         for unexpected_pattern in unexpected_patterns:
             for console_log_message in stderr.split("\n"):
                 if unexpected_pattern in console_log_message:
-                    logger.error("Found unexpected message in console log: {}".format(console_log_message))
+                    logger.error(f"Found unexpected message in console log: {console_log_message}")
                     raise Exception("Unexpected error log in console", console_log_message)
 
     def dump_stderr(self, last_n_lines=10):

@@ -194,15 +194,15 @@ def test_final():
     expected = [None,] * len(messages)
 
     s = SocketSender(AF_UNIX, 'log-stream', dgram=0, repeat=10)
-    for ndx in range(0, len(messages)):
+    for ndx in range(len(messages)):
         if not expected[ndx]:
             expected[ndx] = []
         expected[ndx].extend(s.sendMessages(messages[ndx]))
 
-    for ndx in range(0, len(messages)):
-        if not check_file_expected('test-final%d' % (ndx + 1,), expected[ndx]):
-            return False
-    return True
+    return all(
+        check_file_expected('test-final%d' % (ndx + 1,), expected[ndx])
+        for ndx in range(len(messages))
+    )
 
 def test_fallback():
     messages = (
@@ -214,15 +214,15 @@ def test_fallback():
     expected = [None,] * len(messages)
 
     s = SocketSender(AF_UNIX, 'log-stream', dgram=0, repeat=10)
-    for ndx in range(0, len(messages)):
+    for ndx in range(len(messages)):
         if not expected[ndx]:
             expected[ndx] = []
         expected[ndx].extend(s.sendMessages(messages[ndx]))
 
-    for ndx in range(0, len(messages)):
-        if not check_file_expected('test-fb%d' % (ndx + 1,), expected[ndx]):
-            return False
-    return True
+    return all(
+        check_file_expected('test-fb%d' % (ndx + 1,), expected[ndx])
+        for ndx in range(len(messages))
+    )
 
 def test_catchall():
 

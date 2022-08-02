@@ -116,9 +116,7 @@ init_env()
 seed_rnd()
 
 
-verbose = False
-if len(sys.argv) > 1:
-    verbose = True
+verbose = len(sys.argv) > 1
 try:
     for test_module in tests:
         if hasattr(test_module, "check_env") and not test_module.check_env():
@@ -133,13 +131,13 @@ try:
             test_case = getattr(test_module, obj)
 
             if type(test_module.config) is str:
-                test_case_name = test_module.__name__ + '.' + obj
+                test_case_name = f'{test_module.__name__}.{obj}'
                 if not run_testcase(test_case_name, test_module.config, verbose, test_case):
                     failed_tests.append(test_case_name)
 
             elif type(test_module.config) is dict:
                 for config_name in test_module.config:
-                    testcase_name = "%s.%s[%s]" %(test_module.__name__, obj, config_name)
+                    testcase_name = f"{test_module.__name__}.{obj}[{config_name}]"
                     config = test_module.config[config_name]
                     if not run_testcase(testcase_name, config, verbose, test_case):
                         failed_tests.append(testcase_name)
@@ -147,8 +145,8 @@ try:
 finally:
     stop_syslogng()
 
-if len(failed_tests)>0:
-    print("List of failed test cases: %s" % ','.join(failed_tests))
+if failed_tests:
+    print(f"List of failed test cases: {','.join(failed_tests)}")
     sys.exit(1)
 
 sys.exit(0)

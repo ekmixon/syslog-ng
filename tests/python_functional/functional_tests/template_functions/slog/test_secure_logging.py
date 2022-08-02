@@ -24,14 +24,14 @@ from src.helpers.secure_logging.conftest import *  # noqa:F403, F401
 
 seqnum = "$(iterate $(+ 1 $_) 0)"
 message_base = "example-message"
-example_message = "{}: {}".format(message_base, seqnum)
+example_message = f"{message_base}: {seqnum}"
 num_of_messages = 3
 
 
 def test_secure_logging(config, syslog_ng, slog):
     output_file_name = "output.log"
     generator_source = config.create_example_msg_generator_source(num=num_of_messages, template=config.stringify(example_message), freq="0")
-    secure_log_template = "$(slog -k {} -m {} $MSG)".format(slog.derived_key, slog.cmac)
+    secure_log_template = f"$(slog -k {slog.derived_key} -m {slog.cmac} $MSG)"
     file_destination = config.create_file_destination(file_name=output_file_name, template=config.stringify(secure_log_template + '\n'))
 
     config.create_logpath(statements=[generator_source, file_destination])
@@ -42,4 +42,7 @@ def test_secure_logging(config, syslog_ng, slog):
     assert not any(map(lambda x: message_base in x, logs))
 
     decrypted = slog.decrypt(output_file_name)
-    assert decrypted == ["{}: {}: {}".format(str(i).zfill(16), message_base, i) for i in range(num_of_messages)]
+    assert decrypted == [
+        f"{str(i).zfill(16)}: {message_base}: {i}"
+        for i in range(num_of_messages)
+    ]

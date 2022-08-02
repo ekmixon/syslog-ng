@@ -53,8 +53,15 @@ def _yacc2xml(yacc_content):
     with _write_to_file(yacc_content) as file:
         xml_filepath = NamedTemporaryFile().name
         try:
-            if not _run_in_shell(['bison', '--xml=' + xml_filepath, '--output=/dev/null', file.name]):
-                raise Exception('Failed to convert to xml:\n{}\n'.format(yacc_content))
+            if not _run_in_shell(
+                [
+                    'bison',
+                    f'--xml={xml_filepath}',
+                    '--output=/dev/null',
+                    file.name,
+                ]
+            ):
+                raise Exception(f'Failed to convert to xml:\n{yacc_content}\n')
         except FileNotFoundError:
             raise Exception('bison executable not found')
         return xml_filepath

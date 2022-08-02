@@ -84,14 +84,14 @@ class TemplateLexer(LexBasedLexer):
     def t_dollar_MACRO(self, t):
         r'[a-zA-Z0-9_]+'
         t.lexer.pop_state()
-        t.value = '$' + t.value
+        t.value = f'${t.value}'
         t.lexpos = t.lexer.current_token_pos
         return t
 
     def t_dollar_BRACE_OPEN(self, t):
         r'{'
         t.lexer.push_state('dollarbrace')
-        t.lexer.current_token = '$' + t.value
+        t.lexer.current_token = f'${t.value}'
 
     def t_dollarbrace_MACRO(self, t):
         r'[^}]+'
@@ -175,7 +175,9 @@ class TemplateLexer(LexBasedLexer):
         t.lexer.pop_state()
 
     def t_error(self, t):
-        raise TemplateLexerError("Illegal character {} in state {}".format(t.value, self._lexer.lexstate))
+        raise TemplateLexerError(
+            f"Illegal character {t.value} in state {self._lexer.lexstate}"
+        )
 
     def t_dollar_error(self, t):
         return self.t_error(t)

@@ -49,8 +49,9 @@ class LangBasedCompleter(Completer):
             self._evaluate_language(entire_input, word_to_be_completed))
 
         completers = self._find_applicable_completers(expected_tokens)
-        completions = self._collect_completions(completers, last_token, completion_prefix, word_to_be_completed)
-        return completions
+        return self._collect_completions(
+            completers, last_token, completion_prefix, word_to_be_completed
+        )
 
     def _chop_prefixes(self, entire_input, word_to_be_completed):
         if word_to_be_completed == entire_input:
@@ -75,11 +76,7 @@ class LangBasedCompleter(Completer):
         else:
             completion_prefix = ''
 
-        if replaced_token is None:
-            replaced_token = ''
-        else:
-            replaced_token = replaced_token.value or ''
-
+        replaced_token = '' if replaced_token is None else replaced_token.value or ''
         return expected_tokens, replaced_token, completion_prefix, word_to_be_completed
 
     def _find_applicable_completers(self, expected_tokens):

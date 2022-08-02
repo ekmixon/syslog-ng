@@ -28,17 +28,17 @@ class BSDFormat(object):
     def format_message(message, add_new_line=True):
         formatted_message = ""
         if message.priority_value:
-            formatted_message += "<{}>".format(message.priority_value)
+            formatted_message += f"<{message.priority_value}>"
         if message.bsd_timestamp_value:
-            formatted_message += "{}".format(message.bsd_timestamp_value)
+            formatted_message += f"{message.bsd_timestamp_value}"
         if message.hostname_value:
-            formatted_message += " {}".format(message.hostname_value)
+            formatted_message += f" {message.hostname_value}"
         if message.program_value:
-            formatted_message += " {}".format(message.program_value)
+            formatted_message += f" {message.program_value}"
         if message.pid_value:
-            formatted_message += "[{}]:".format(message.pid_value)
+            formatted_message += f"[{message.pid_value}]:"
         if message.message_value:
-            formatted_message += " {}".format(message.message_value)
+            formatted_message += f" {message.message_value}"
         if add_new_line:
             formatted_message += "\n"
         return formatted_message

@@ -66,9 +66,9 @@ class File(object):
     def wait_for_creation(self):
         file_created = wait_until_true(self.path.exists)
         if file_created:
-            logger.debug("File has been created: {}".format(self.path))
+            logger.debug(f"File has been created: {self.path}")
         else:
-            raise Exception("File was not created in time: {}".format(self.path))
+            raise Exception(f"File was not created in time: {self.path}")
         return file_created
 
     def open(self, mode):
@@ -124,4 +124,6 @@ class File(object):
         try:
             return self.wait_for_lines(lines, timeout)
         except Exception:
-            raise Exception("Could not find {} number of lines in {}. Remaining number of lines: {}.".format(number_of_lines, self.path, len(lines)))
+            raise Exception(
+                f"Could not find {number_of_lines} number of lines in {self.path}. Remaining number of lines: {len(lines)}."
+            )

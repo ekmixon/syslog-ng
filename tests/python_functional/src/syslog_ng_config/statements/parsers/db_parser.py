@@ -43,11 +43,9 @@ class DBParserConfig(object):
             node_ruleset_pattern.text = self.ruleset_pattern
             node_rules = SubElement(node_ruleset, "rules")
 
-            rule_id = 0
-            for rule in self.rules:
+            for rule_id, rule in enumerate(self.rules):
                 node_rule = SubElement(node_rules, "rule", id=str(rule_id))
                 node_rule.set("class", rule["class"])
-                rule_id += 1
                 node_patterns = SubElement(node_rule, "patterns")
                 node_pattern = SubElement(node_patterns, "pattern")
                 node_pattern.text = rule["rule"]
@@ -59,7 +57,7 @@ class DBParser(Parser):
     index = 0
 
     def __init__(self, config, **options):
-        path = Path(tc_parameters.WORKING_DIR, "patterndb-{}.xml".format(self.index))
+        path = Path(tc_parameters.WORKING_DIR, f"patterndb-{self.index}.xml")
         config.write_to(path)
         self.index += 1
         super(DBParser, self).__init__("db-parser", file=path.resolve(), **options)

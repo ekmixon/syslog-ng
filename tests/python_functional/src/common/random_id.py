@@ -26,4 +26,4 @@ UNIQUE_LENGTH = None
 
 
 def get_unique_id(length=UNIQUE_LENGTH):
-    return str(random.getrandbits(16 * 8))[0:length]
+    return str(random.getrandbits(16 * 8))[:length]

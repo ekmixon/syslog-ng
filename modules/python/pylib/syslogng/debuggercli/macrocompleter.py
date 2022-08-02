@@ -52,11 +52,7 @@ class MacroCompleter(Completer):
             return True
         if entire_input[0] == '$' and self._is_valid_macro(entire_input[1:]):
             return True
-        if entire_input == '${':
-            return True
-        if entire_input[:2] == '${':
-            return True
-        return False
+        return True if entire_input == '${' else entire_input[:2] == '${'
 
     def _is_valid_macro(self, macro):
         return all(self._is_valid_macro_char(c) for c in macro)
@@ -67,11 +63,7 @@ class MacroCompleter(Completer):
             return True
         if macro_char >= 'a' and macro_char <= 'z':
             return True
-        if macro_char >= '0' and macro_char <= '9':
-            return True
-        if macro_char == '_':
-            return True
-        return False
+        return True if macro_char >= '0' and macro_char <= '9' else macro_char == '_'
 
     def _collect_completions(self, word):
         self._reset_completions()
@@ -108,7 +100,7 @@ class MacroCompleter(Completer):
         return self._completions
 
     def _is_word_a_date_prefix(self, word):
-        return word[:3] in ['$' + x for x in self._date_wildcards]
+        return word[:3] in [f'${x}' for x in self._date_wildcards]
 
     @staticmethod
     def _is_word_a_numbered_match_prefix(word):
@@ -120,14 +112,14 @@ class MacroCompleter(Completer):
 
     @staticmethod
     def _is_word_a_numbered_match_prefix_with_brace(word):
-        return word[0:2] == '${' and word[2:3].isdigit()
+        return word[:2] == '${' and word[2:3].isdigit()
 
     def _is_word_a_date_prefix_with_brace(self, word):
         return word[:4] in ['${' + x for x in self._date_wildcards]
 
     @staticmethod
     def _is_word_a_braced_prefix(word):
-        return word[0:2] == '${'
+        return word[:2] == '${'
 
     @staticmethod
     def _is_macro_qualified(macro):
@@ -145,7 +137,7 @@ class MacroCompleter(Completer):
 
     @classmethod
     def _is_macro_a_date_macro(cls, macro):
-        return macro[0:2] in cls._date_wildcards
+        return macro[:2] in cls._date_wildcards
 
     @classmethod
     def _is_macro_a_small_numbered_match(cls, macro):
@@ -193,7 +185,7 @@ class MacroCompleter(Completer):
 
     def _collect_date_wildcards(self):
         for (wildcard, description) in self._date_wildcards.items():
-            yield '${}* ({})'.format(wildcard, description)
+            yield f'${wildcard}* ({description})'
 
     def _collect_date_wildcard_with_brace(self):
         for (wildcard, description) in self._date_wildcards.items():

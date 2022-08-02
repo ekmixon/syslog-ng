@@ -58,6 +58,7 @@ class CompleterTestCase(unittest.TestCase):
     def _assert_completions_start_with_word(self, word):
         completions = self._get_completions(word)
         for completion in completions:
-            self.assertTrue(completion.startswith(word),
-                            msg="Completion {} does not start with the word to be completed {}"
-                                .format(completion, word))
+            self.assertTrue(
+                completion.startswith(word),
+                msg=f"Completion {completion} does not start with the word to be completed {word}",
+            )

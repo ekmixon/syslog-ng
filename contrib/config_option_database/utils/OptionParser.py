@@ -123,7 +123,7 @@ def _resolve_token(token):
         return '/'.join(sorted(db[token]))
     except KeyError:
         if token.startswith("KW_"):
-            raise Exception('Keyword without resolvation: ' + token)
+            raise Exception(f'Keyword without resolvation: {token}')
         return type_template.format(_sanitize(token))
 
 

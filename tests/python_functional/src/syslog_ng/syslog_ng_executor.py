@@ -45,7 +45,7 @@ class SyslogNgExecutor(object):
         elif external_tool == "strace":
             return self.run_process_with_strace()
         else:
-            raise Exception("Unknown external tool was selected: {}".format(external_tool))
+            raise Exception(f"Unknown external tool was selected: {external_tool}")
 
     def run_process_with_valgrind(self):
         valgrind_command_args = [
@@ -59,8 +59,9 @@ class SyslogNgExecutor(object):
             "--error-limit=no",
             "--num-callers=40",
             "--verbose",
-            "--log-file={}".format(self.__instance_paths.get_external_tool_output_path("valgrind")),
+            f'--log-file={self.__instance_paths.get_external_tool_output_path("valgrind")}',
         ]
+
         full_command_args = valgrind_command_args + self.__construct_syslog_ng_process()
         return self.__process_executor.start(
             command=full_command_args,
@@ -103,7 +104,7 @@ class SyslogNgExecutor(object):
             "--core",
             core_file,
         ]
-        core_postfix = "gdb_core_{}".format(get_unique_id())
+        core_postfix = f"gdb_core_{get_unique_id()}"
         return self.__command_executor.run(
             command=gdb_command_args,
             stdout_path=self.__instance_paths.get_stdout_path_with_postfix(postfix=core_postfix),
@@ -139,16 +140,16 @@ class SyslogNgExecutor(object):
             syslog_ng_process_args += ["--no-caps"]
         if config_path is None:
             config_path = self.__instance_paths.get_config_path()
-        syslog_ng_process_args += ["--cfgfile={}".format(config_path)]
+        syslog_ng_process_args += [f"--cfgfile={config_path}"]
         if persist_path is None:
             persist_path = self.__instance_paths.get_persist_path()
-        syslog_ng_process_args += ["--persist-file={}".format(persist_path)]
+        syslog_ng_process_args += [f"--persist-file={persist_path}"]
         if pid_path is None:
             pid_path = self.__instance_paths.get_pid_path()
-        syslog_ng_process_args += ["--pidfile={}".format(pid_path)]
+        syslog_ng_process_args += [f"--pidfile={pid_path}"]
         if control_socket_path is None:
             control_socket_path = self.__instance_paths.get_control_socket_path()
-        syslog_ng_process_args += ["--control={}".format(control_socket_path)]
+        syslog_ng_process_args += [f"--control={control_socket_path}"]
         return syslog_ng_process_args
 
     def __construct_syslog_ng_command(self, command):

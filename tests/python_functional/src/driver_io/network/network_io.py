@@ -37,7 +37,10 @@ class NetworkIO():
         self.__transport = transport
 
     def write(self, content, rate=None):
-        loggen_input_file_path = Path(tc_parameters.WORKING_DIR, "loggen_input_{}.txt".format(get_unique_id()))
+        loggen_input_file_path = Path(
+            tc_parameters.WORKING_DIR, f"loggen_input_{get_unique_id()}.txt"
+        )
+
 
         loggen_input_file = File(loggen_input_file_path)
         loggen_input_file.open(mode="w")

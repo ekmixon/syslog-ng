@@ -62,6 +62,9 @@ def test_map_value_pairs():
     for msg in messages:
         expected.extend(s.sendMessages(msg, pri=7))
     stopped = stop_syslogng()
-    if not stopped or not check_file_expected('test-map-value-pairs', expected, settle_time=2):
-        return False
-    return True
+    return bool(
+        stopped
+        and check_file_expected(
+            'test-map-value-pairs', expected, settle_time=2
+        )
+    )

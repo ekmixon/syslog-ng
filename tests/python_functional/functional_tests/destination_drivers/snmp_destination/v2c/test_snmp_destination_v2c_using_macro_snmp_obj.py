@@ -31,7 +31,7 @@ def test_snmp_dest_v2c_using_macros_in_snmp_obj(config, syslog_ng, snmptrapd, sn
     default_severity = "0"
     program = "testprogram"
     message = "test message"
-    input_message = "<38>Feb 11 21:27:22 testhost {}[9999]: {}\n".format(program, message)
+    input_message = f"<38>Feb 11 21:27:22 testhost {program}[9999]: {message}\n"
 
     file_source = config.create_file_source(file_name="input.log")
 
@@ -53,11 +53,12 @@ def test_snmp_dest_v2c_using_macros_in_snmp_obj(config, syslog_ng, snmptrapd, sn
     syslog_ng.start(config)
 
     expected_traps = [
-        '.1.3.6.1.4.1.9.9.41.1.2.3.1.2.55 = STRING: "{}"'.format(default_facility),
-        '.1.3.6.1.4.1.9.9.41.1.2.3.1.3.55 = INTEGER: {}'.format(default_severity),
-        '.1.3.6.1.4.1.9.9.41.1.2.3.1.4.55 = STRING: "{}"'.format(program),
-        '.1.3.6.1.4.1.9.9.41.1.2.3.1.5.55 = STRING: "{}"'.format(message),
+        f'.1.3.6.1.4.1.9.9.41.1.2.3.1.2.55 = STRING: "{default_facility}"',
+        f'.1.3.6.1.4.1.9.9.41.1.2.3.1.3.55 = INTEGER: {default_severity}',
+        f'.1.3.6.1.4.1.9.9.41.1.2.3.1.4.55 = STRING: "{program}"',
+        f'.1.3.6.1.4.1.9.9.41.1.2.3.1.5.55 = STRING: "{message}"',
         '.1.3.6.1.6.3.1.1.4.1.0 = OID: .1.3.6.1.4.1.9.9.41.2.0.1',
     ]
+
 
     assert expected_traps == snmptrapd.get_traps(len(expected_traps))

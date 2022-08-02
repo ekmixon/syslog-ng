@@ -35,8 +35,7 @@ class BisonGraph():
     def _children_of_rule_sorted(self, node):
         children = []
         for child, arcs in self.graph[node].items():
-            for _, arc in arcs.items():
-                children.append((arc['index'], child))
+            children.extend((arc['index'], child) for _, arc in arcs.items())
         return [x[1] for x in sorted(children)]
 
     def get_children(self, node):
@@ -49,11 +48,11 @@ class BisonGraph():
         return sorted(self.graph.predecessors(node))
 
     def is_terminal(self, node):
-        return len(list(self.graph.successors(node))) == 0
+        return not list(self.graph.successors(node))
 
     def is_rule(self, node):
         if node not in self.get_nodes():
-            raise Exception('Node not in graph: ' + node)
+            raise Exception(f'Node not in graph: {node}')
         try:
             int(node)
         except ValueError:
@@ -67,7 +66,9 @@ class BisonGraph():
         elif not self.is_rule(from_node) and self.is_rule(to_node):
             self.graph.add_edge(from_node, to_node)
         else:
-            raise Exception('Arc must be added from non-rule to rule or rule to non-rule: ' + from_node + '->' + to_node)
+            raise Exception(
+                f'Arc must be added from non-rule to rule or rule to non-rule: {from_node}->{to_node}'
+            )
 
     def make_terminal(self, node):
         children = self.get_children(node)

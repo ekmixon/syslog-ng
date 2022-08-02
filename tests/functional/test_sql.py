@@ -66,13 +66,12 @@ def check_env():
     if re.match('hp-ux', sys.platform) and not re.match('ia64', os.uname()[4]):
         soext='.sl'
 
-    found = False
     paths = (os.environ.get('dbd_dir', ''), '/usr/local/lib/dbd', '/usr/lib/dbd',
         '/usr/lib64/dbd/', '/opt/syslog-ng/lib/dbd', '/usr/lib/x86_64-linux-gnu/dbd')
-    for pth in paths:
-        if pth and os.path.isfile('%s/libdbdsqlite3%s' % (pth, soext)):
-            found = True
-            break
+    found = any(
+        pth and os.path.isfile(f'{pth}/libdbdsqlite3{soext}') for pth in paths
+    )
+
     if not found:
         print_user('No sqlite3 backend for libdbi. Skipping SQL test.\nSearched: %s\n' % ':'.join(paths))
         return False
@@ -96,4 +95,10 @@ def test_sql():
     time.sleep(10)
     stopped = stop_syslogng()
     time.sleep(5)
-    return stopped and check_sql_expected("%s/test-sql.db" % current_dir, "logs", expected, settle_time=5, syslog_prefix="Sep  7 10:43:21 bzorp prog 12345")
+    return stopped and check_sql_expected(
+        f"{current_dir}/test-sql.db",
+        "logs",
+        expected,
+        settle_time=5,
+        syslog_prefix="Sep  7 10:43:21 bzorp prog 12345",
+    )

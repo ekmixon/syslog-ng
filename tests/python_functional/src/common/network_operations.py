@@ -28,9 +28,7 @@ def get_hostname():
 
 def get_fqdn():
     fqdn = socket.getfqdn(get_hostname())
-    if "." not in fqdn:
-        return get_hostname()
-    return fqdn
+    return get_hostname() if "." not in fqdn else fqdn
 
 
 def get_short_hostname():

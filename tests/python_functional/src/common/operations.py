@@ -23,6 +23,4 @@
 
 
 def cast_to_list(items):
-    if isinstance(items, list):
-        return items
-    return [items]
+    return items if isinstance(items, list) else [items]

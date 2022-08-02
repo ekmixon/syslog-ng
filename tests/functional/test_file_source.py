@@ -77,26 +77,31 @@ def create_source_files(recursive=False):
     )
     expected = []
 
-    for ndx in range(0, len(messages)):
-        if not recursive:
-            s = FileSender('wildcard/%d.log' % (ndx % 4), repeat=100)
-        else:
-            s = FileSender('wildcard/wildcard%d/%d.log' % ((ndx % 2),(ndx % 4)), repeat=100)
+    for ndx in range(len(messages)):
+        s = (
+            FileSender(
+                'wildcard/wildcard%d/%d.log' % ((ndx % 2), (ndx % 4)),
+                repeat=100,
+            )
+            if recursive
+            else FileSender('wildcard/%d.log' % (ndx % 4), repeat=100)
+        )
+
         expected.extend(s.sendMessages(messages[ndx]))
     return expected
 
 def test_wildcard_files():
     expected = create_source_files()
 
-    if not check_file_expected('test-wildcard', expected, settle_time=settle_time):
-        return False
-    return True
+    return bool(
+        check_file_expected('test-wildcard', expected, settle_time=settle_time)
+    )
 
 def test_wildcard_recursion():
     expected = create_source_files(True)
-    if not check_file_expected('test-wildcard', expected, settle_time=settle_time):
-        return False
-    return True
+    return bool(
+        check_file_expected('test-wildcard', expected, settle_time=settle_time)
+    )
 
 def file_get_contents(filename):
     with open(filename) as f:
@@ -105,15 +110,15 @@ def file_get_contents(filename):
 def test_wildcard_no_directory_exists():
     stop_syslogng()
     os.system("rm -rf wildcard")
-    
+
     start_syslogng(file_get_contents("test.conf"))
     os.system("mkdir wildcard")
 
     expected = create_source_files()
 
-    if not check_file_expected('test-wildcard', expected, settle_time=settle_time):
-        return False
-    return True
+    return bool(
+        check_file_expected('test-wildcard', expected, settle_time=settle_time)
+    )
 
 def test_wildcard_runtime_detection():
     expected = create_source_files()
@@ -121,6 +126,6 @@ def test_wildcard_runtime_detection():
     messagegen.need_to_flush = False
     print_user("waiting for syslog-ng to process files (%d sec)" % 5)
     time.sleep(5)
-    if not check_file_expected('test-wildcard', expected, settle_time=settle_time):
-        return False
-    return True
+    return bool(
+        check_file_expected('test-wildcard', expected, settle_time=settle_time)
+    )

@@ -73,16 +73,17 @@ def _exec(command):
 
 
 def create_block(block_name, files):
-    block = '## {}\n\n'.format(block_name)
+    block = f'## {block_name}\n\n'
     for f in files:
         entry = ''
         match_pr_id = re.search(r'(\d+)(-\d+)?.md$', f.name)
         if not match_pr_id:
-            sys.exit('Invalid filename: {}'.format(f.name))
+            sys.exit(f'Invalid filename: {f.name}')
 
-        pr_id = match_pr_id.group(1)
+        pr_id = match_pr_id[1]
 
-        entry += ' * {}\n([#{}](https://github.com/syslog-ng/syslog-ng/pull/{}))'.format(f.read_text().rstrip(), pr_id, pr_id)
+        entry += f' * {f.read_text().rstrip()}\n([#{pr_id}](https://github.com/syslog-ng/syslog-ng/pull/{pr_id}))'
+
         entry = entry.replace('\n', '\n   ')
         block += entry + '\n'
     block += '\n'
@@ -95,12 +96,11 @@ def get_last_version():
 
 
 def get_next_version():
-    next_version = (root_dir / 'VERSION').read_text().rstrip()
-    return next_version
+    return (root_dir / 'VERSION').read_text().rstrip()
 
 def create_version():
     next_version = get_next_version()
-    return '{}\n{}\n\n'.format(next_version, len(next_version) * '=')
+    return f"{next_version}\n{len(next_version) * '='}\n\n"
 
 def create_highlights_block():
     return '## Highlights\n' \
@@ -112,8 +112,7 @@ def create_highlights_block():
 def create_standard_blocks():
     standard_blocks = ''
     for block_name, glob in blocks:
-        entries = list(news_dir.glob(glob))
-        if len(entries) > 0:
+        if entries := list(news_dir.glob(glob)):
             standard_blocks += create_block(block_name, entries)
     return standard_blocks
 
@@ -125,8 +124,14 @@ def create_credits_block():
         concated = ", ".join([c.replace(" ", "\0") for c in contributors])
         return textwrap.fill(concated, width=70).replace("\0", " ")
 
-    stdout = _exec(r'git rev-list --no-merges --format=format:%aN syslog-ng-' + get_last_version() + r'..HEAD | '
-                   r'grep -Ev "^commit [a-z0-9]{40}$" | sort | uniq')
+    stdout = _exec(
+        (
+            f'git rev-list --no-merges --format=format:%aN syslog-ng-{get_last_version()}'
+            + r'..HEAD | '
+            r'grep -Ev "^commit [a-z0-9]{40}$" | sort | uniq'
+        )
+    )
+
     contributors = stdout.rstrip().split('\n')
     contributors += team_members
     contributors = filter(lambda x : x not in exclude_contributor_list, contributors)
@@ -148,7 +153,7 @@ def create_credits_block():
 
 def create_newsfile(news):
     newsfile.write_text(news)
-    print('Newsfile created at {}\n'.format(newsfile.resolve()))
+    print(f'Newsfile created at {newsfile.resolve()}\n')
 
 
 def cleanup():

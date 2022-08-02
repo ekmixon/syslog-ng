@@ -51,12 +51,15 @@ class SyslogNgCtlExecutor(object):
 
     def __construct_std_file_path(self, command_short_name, std_type):
         instance_name = self.__instance_paths.get_instance_name()
-        return Path(tc_parameters.WORKING_DIR, "syslog_ng_ctl_{}_{}_{}".format(instance_name, command_short_name, std_type))
+        return Path(
+            tc_parameters.WORKING_DIR,
+            f"syslog_ng_ctl_{instance_name}_{command_short_name}_{std_type}",
+        )
 
     def __construct_ctl_command(self, command):
         ctl_command = [self.__syslog_ng_control_tool_path]
         ctl_command += command
-        ctl_command.append("--control={}".format(self.__syslog_ng_control_socket_path))
+        ctl_command.append(f"--control={self.__syslog_ng_control_socket_path}")
         return ctl_command
 
     @staticmethod

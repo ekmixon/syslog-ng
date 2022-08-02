@@ -48,7 +48,5 @@ class FileSource(SourceDriver):
         for _ in range(counter):
             self.io.write(formatted_log)
         logger.info(
-            "Content has been written to\nresource: {}\n"
-            "number of times: {}\n"
-            "content: {}\n".format(self.get_path(), counter, formatted_log),
+            f"Content has been written to\nresource: {self.get_path()}\nnumber of times: {counter}\ncontent: {formatted_log}\n"
         )

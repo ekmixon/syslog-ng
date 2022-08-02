@@ -28,14 +28,14 @@ class DriverStatsHandler(object):
     def __init__(self, group_type, driver_name):
         if group_type == "destination":
             statement_short_name = "dst"
-            self.component = "{}.{}".format(statement_short_name, driver_name)
+            self.component = f"{statement_short_name}.{driver_name}"
         elif group_type == "source":
             statement_short_name = "src"
-            self.component = "{}.{}".format(statement_short_name, driver_name)
+            self.component = f"{statement_short_name}.{driver_name}"
         elif group_type == "parser":
-            self.component = "{}".format(group_type)
+            self.component = f"{group_type}"
         else:
-            raise Exception("Unknown group_type: {}".format(group_type))
+            raise Exception(f"Unknown group_type: {group_type}")
 
         self.syslog_ng_ctl = SyslogNgCtl(tc_parameters.INSTANCE_PATH)
 
@@ -46,10 +46,7 @@ class DriverStatsHandler(object):
         return self.build_pattern(delimiter=";")
 
     def build_pattern(self, delimiter):
-        return "{}{}".format(
-            self.component,
-            delimiter,
-        )
+        return f"{self.component}{delimiter}"
 
     def parse_result(self, result, result_type):
         statistical_elements = ["memory_usage", "written", "processed", "dropped", "queued", "stamp", "discarded"]
@@ -58,23 +55,26 @@ class DriverStatsHandler(object):
             for line in result:
                 if stat_element in line:
                     if result_type == "query":
-                        parsed_output.update({stat_element: int(line.split(".")[-1].split("=")[-1])})
+                        parsed_output[stat_element] = int(line.split(".")[-1].split("=")[-1])
                     elif result_type == "stats":
-                        parsed_output.update({stat_element: int(line.split(".")[-1].split(";")[-1])})
+                        parsed_output[stat_element] = int(line.split(".")[-1].split(";")[-1])
                     else:
-                        raise Exception("Unknown result_type: {}".format(result_type))
+                        raise Exception(f"Unknown result_type: {result_type}")
         return parsed_output
 
     def filter_stats_result(self, stats_result, stats_pattern):
-        filtered_list = []
-        for stats_line in stats_result:
-            if stats_pattern in stats_line:
-                filtered_list.append(stats_line)
-        return filtered_list
+        return [
+            stats_line
+            for stats_line in stats_result
+            if stats_pattern in stats_line
+        ]
 
     def get_query(self):
         query_pattern = self.build_query_pattern()
-        query_result = self.syslog_ng_ctl.query(pattern="*{}*".format(query_pattern))['stdout'].splitlines()
+        query_result = self.syslog_ng_ctl.query(pattern=f"*{query_pattern}*")[
+            'stdout'
+        ].splitlines()
+
 
         return self.parse_result(result=query_result, result_type="query")
 

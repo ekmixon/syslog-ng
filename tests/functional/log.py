@@ -23,11 +23,11 @@
 import time
 
 def print_user(msg):
-    print('     %s %s' % (time.strftime('%Y-%m-%dT%H:%M:%S'), msg))
+    print(f"     {time.strftime('%Y-%m-%dT%H:%M:%S')} {msg}")
 
 def print_start(testcase):
     print("\n\n##############################################")
-    print("### Starting testcase: %s" % testcase)
+    print(f"### Starting testcase: {testcase}")
     print("##############################################")
     print_user("Testcase start")
 
@@ -35,8 +35,8 @@ def print_end(testcase, result):
     print_user("Testcase end")
     print("##############################################")
     if result:
-        print("### PASS: %s" % testcase)
+        print(f"### PASS: {testcase}")
     else:
-        print("### FAIL: %s" % testcase)
+        print(f"### FAIL: {testcase}")
     print("##############################################\n\n")
 

@@ -86,7 +86,7 @@ class DummyPythonDest(object):
 
 class DummyBatchDestination(object):
     def init(self, options):
-        self.bulk = list()
+        self.bulk = []
         return True
 
     def send(self, msg):
@@ -95,5 +95,5 @@ class DummyBatchDestination(object):
 
     def flush(self):
         print("flushing: " + ",".join(self.bulk))
-        self.bulk = list()
+        self.bulk = []
         return self.SUCCESS

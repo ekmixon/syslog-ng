@@ -56,7 +56,8 @@ class SNMPtrapd(object):
 
         self.snmptrapd_proc = ProcessExecutor().start(
             [
-                "snmptrapd", "-f",
+                "snmptrapd",
+                "-f",
                 "--disableAuthorization=yes",
                 "-C",
                 "-m ALL",
@@ -67,12 +68,15 @@ class SNMPtrapd(object):
                 "--authCommunity=log public",
                 self.port,
                 "-d",
-                "-Lf", os.path.relpath(str(self.snmptrapd_log)),
-                "-F", "{}%v\n".format(self.TRAP_LOG_PREFIX),
+                "-Lf",
+                os.path.relpath(str(self.snmptrapd_log)),
+                "-F",
+                f"{self.TRAP_LOG_PREFIX}%v\n",
             ],
             self.snmptrapd_stdout_path,
             self.snmptrapd_stderr_path,
         )
+
         wait_until_true(self.wait_for_snmptrapd_log_creation)
         wait_until_true(self.wait_for_snmptrapd_startup)
         return self.snmptrapd_proc.is_running()
@@ -100,9 +104,8 @@ class SNMPtrapd(object):
 
         while True:
             trap_line = f.wait_for_lines([self.TRAP_LOG_PREFIX])[0]
-            res = re.match('({})(.*)'.format(self.TRAP_LOG_PREFIX), trap_line)
-            if (res):
-                trap_list.extend(res.group(2).rstrip().split("\t"))
+            if res := re.match(f'({self.TRAP_LOG_PREFIX})(.*)', trap_line):
+                trap_list.extend(res[2].rstrip().split("\t"))
             if len(trap_list) == counter:
                 break
 
@@ -149,14 +152,13 @@ class SNMPTestParams(object):
         return '".1.3.6.1.6.3.1.1.4.1.0","Objectid",".1.3.6.1.4.1.9.9.41.2.0.1"'
 
     def get_cisco_snmp_obj(self):
-        cisco_snmp_obj = (
+        return (
             '"1.3.6.1.4.1.9.9.41.1.2.3.1.2.55", "Octetstring", "SYS"',
             '"1.3.6.1.4.1.9.9.41.1.2.3.1.3.55", "Integer", "6"',
             '"1.3.6.1.4.1.9.9.41.1.2.3.1.4.55", "Octetstring", "CONFIG_I"',
             '"1.3.6.1.4.1.9.9.41.1.2.3.1.5.55", "Octetstring", "Configured from console by vty1 (10.30.0.32)"',
             '"1.3.6.1.4.1.9.9.41.1.2.3.1.6.55", "Timeticks", "97881"',
         )
-        return cisco_snmp_obj
 
     def get_expected_cisco_trap(self):
         return sorted([

@@ -51,8 +51,6 @@ class MessageSender(object):
         print_user("generating %d messages using transport %s" % (self.repeat, str(self)))
 
         self.initSender()
-        expected = []
-
         for counter in range(1, self.repeat):
             if self.new_protocol == 0:
                 line = '<%d>%s %s %03d/%05d %s %s' % (pri, syslog_prefix, msg, session_counter, counter, str(self), padding)
@@ -63,7 +61,7 @@ class MessageSender(object):
             if self.dgram == 0 and self.new_protocol == 1:
                 line = '%d %s' % (len(line), line)
             self.sendMessage(line) # file or socket
-        expected.append((msg, session_counter, self.repeat))
+        expected = [(msg, session_counter, self.repeat)]
         session_counter = session_counter + 1
         return expected
 
@@ -94,7 +92,7 @@ class SocketSender(MessageSender):
 
 
     def sendMessage(self, msg):
-        line = '%s%s' % (msg, self.terminate_seq)
+        line = f'{msg}{self.terminate_seq}'
         if self.send_by_bytes:
             for c in line:
                 try:
@@ -135,17 +133,18 @@ class SocketSender(MessageSender):
 
     def __str__(self):
         if self.family == AF_UNIX:
-            if self.dgram:
-                return 'unix-dgram(%s)' % (self.sock_name)
-            else:
-                return 'unix-stream(%s)' % (self.sock_name)
+            return (
+                f'unix-dgram({self.sock_name})'
+                if self.dgram
+                else f'unix-stream({self.sock_name})'
+            )
+
+        if self.dgram:
+            return f'udp({self.sock_name})'
+        elif not self.ssl:
+            return f'tcp({self.sock_name})'
         else:
-            if self.dgram:
-                return 'udp(%s)' % (self.sock_name,)
-            elif not self.ssl:
-                return 'tcp(%s)' % (self.sock_name,)
-            else:
-                return 'tls(%s)' % (self.sock_name,)
+            return f'tls({self.sock_name})'
 
 
 class FileSender(MessageSender):
@@ -158,10 +157,7 @@ class FileSender(MessageSender):
         self.fd = None
 
         try:
-            if stat.S_ISFIFO(os.stat(file_name).st_mode):
-                self.is_pipe = True
-            else:
-                self.is_pipe = False
+            self.is_pipe = bool(stat.S_ISFIFO(os.stat(file_name).st_mode))
         except OSError:
             self.is_pipe = False
 
@@ -180,12 +176,10 @@ class FileSender(MessageSender):
             self.fd = open(self.file_name, "a")
 
     def sendMessages(self, msg):
-        res = super(FileSender, self).sendMessages(msg)
-
-        return res
+        return super(FileSender, self).sendMessages(msg)
 
     def sendMessage(self, msg):
-        line = '%s%s' % (msg, self.terminate_seq)
+        line = f'{msg}{self.terminate_seq}'
         if self.padding:
             line += '\0' * (self.padding - len(line))
         if self.send_by_bytes:
@@ -197,11 +191,10 @@ class FileSender(MessageSender):
             self.fd.flush()
 
     def __str__(self):
-        if self.is_pipe:
-            if self.padding:
-                return 'pipe(%s[%d])' % (self.file_name, self.padding)
-            else:
-                return 'pipe(%s)' % (self.file_name,)
+        if not self.is_pipe:
+            return f'file({self.file_name})'
+        if self.padding:
+            return 'pipe(%s[%d])' % (self.file_name, self.padding)
         else:
-            return 'file(%s)' % (self.file_name,)
+            return f'pipe({self.file_name})'
 

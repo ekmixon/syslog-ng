@@ -35,8 +35,7 @@ def _parse_args():
     parser.add_argument('--rebuild', '-r', action='store_true',
                         help='Use this flag, if there is a modification in either '
                              'the DB generating script, or the grammar files')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def _merge_block_stored_as_an_option(keyword, arguments, options, blocks):
@@ -185,7 +184,7 @@ def _normalize_options(options):
 def _normalize_arguments(arguments):
     if not arguments:
         arguments = ['']
-    arguments = map(lambda arg: arg if arg else '<empty>', arguments)
+    arguments = map(lambda arg: arg or '<empty>', arguments)
 
     return arguments
 
@@ -198,44 +197,47 @@ def _print_options_helper(block, depth=1):
     for keyword, arguments in _normalize_options(options):
         arguments = _normalize_arguments(arguments)
         if keyword:
-            print(indent + '{}({})'.format(keyword, ' '.join(arguments)))
+            print(indent + f"{keyword}({' '.join(arguments)})")
         else:
-            print(indent + '{}'.format(' '.join(arguments)))
+            print(indent + f"{' '.join(arguments)}")
 
     for key in sorted(blocks.keys()):
-        print(indent + '{}('.format(key))
+        print(indent + f'{key}(')
         _print_options_helper(blocks[key], depth + 1)
-        print(indent + ')')
+        print(f'{indent})')
 
 
 def _print_options(db, context, driver):
     if context not in db:
-        print('The context "{}" is not in the database.'.format(context))
+        print(f'The context "{context}" is not in the database.')
         _print_contexts(db)
     elif driver not in db[context]:
-        print('The driver "{}" is not in the drivers of context "{}".'.format(driver, context))
+        print(f'The driver "{driver}" is not in the drivers of context "{context}".')
         _print_drivers(db, context)
     else:
-        print('{} {}('.format(context, driver))
+        print(f'{context} {driver}(')
         _print_options_helper(db[context][driver])
         print(')')
 
 
 def _print_drivers(db, context):
     if context in db:
-        print('Drivers of context "{}":'.format(context))
+        print(f'Drivers of context "{context}":')
         for driver in sorted(db[context]):
-            print('  {}'.format(driver))
-        print('Print the options of DRIVER with `--context {} --driver DRIVER`.'.format(context))
+            print(f'  {driver}')
+        print(
+            f'Print the options of DRIVER with `--context {context} --driver DRIVER`.'
+        )
+
     else:
-        print('The context "{}" is not in the database.'.format(context))
+        print(f'The context "{context}" is not in the database.')
         _print_contexts(db)
 
 
 def _print_contexts(db):
     print('Valid contexts:')
     for context in sorted(db):
-        print('  {}'.format(context))
+        print(f'  {context}')
     print('Print the drivers of CONTEXT with `--context CONTEXT`.')
 
 
@@ -248,15 +250,15 @@ def _query(db, args):
         _print_options(db, context, driver)
         return
 
-    if context and not driver:
+    if context:
         _print_drivers(db, context)
         return
 
-    if not context and driver:
-        print('Please define the context of "{}" with `--context CONTEXT`.'.format(driver))
+    if driver:
+        print(f'Please define the context of "{driver}" with `--context CONTEXT`.')
         return
 
-    if not context and not driver and not rebuild:
+    if not context and not rebuild:
         _print_contexts(db)
         return
 

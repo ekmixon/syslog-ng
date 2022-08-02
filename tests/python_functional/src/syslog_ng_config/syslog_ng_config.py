@@ -62,11 +62,12 @@ class SyslogNgConfig(object):
         self.__raw_config = raw_config
 
     def write_config(self, config_path):
-        if self.__raw_config:
-            rendered_config = self.__raw_config
-        else:
-            rendered_config = ConfigRenderer(self.__syslog_ng_config).get_rendered_config()
-        logger.info("Generated syslog-ng config\n{}\n".format(rendered_config))
+        rendered_config = (
+            self.__raw_config
+            or ConfigRenderer(self.__syslog_ng_config).get_rendered_config()
+        )
+
+        logger.info(f"Generated syslog-ng config\n{rendered_config}\n")
 
         f = File(config_path)
         with f.open('w+') as config_file:
@@ -138,8 +139,7 @@ class SyslogNgConfig(object):
         return logpath
 
     def create_inner_logpath(self, statements=None, flags=None):
-        inner_logpath = self.__create_logpath_with_conversion(statements, flags)
-        return inner_logpath
+        return self.__create_logpath_with_conversion(statements, flags)
 
     def create_statement_group(self, statements):
         statement_group = StatementGroup(statements)

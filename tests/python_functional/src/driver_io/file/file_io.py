@@ -31,7 +31,7 @@ class FileIO():
     def read_number_of_lines(self, counter):
         if not self.__readable_file.is_opened():
             if not self.__readable_file.wait_for_creation():
-                raise Exception("{} was not created in time.".format(self.__readable_file.path))
+                raise Exception(f"{self.__readable_file.path} was not created in time.")
             self.__readable_file.open("r")
 
         return self.__readable_file.wait_for_number_of_lines(counter)
@@ -39,7 +39,7 @@ class FileIO():
     def read_until_lines(self, lines):
         if not self.__readable_file.is_opened():
             if not self.__readable_file.wait_for_creation():
-                raise Exception("{} was not created in time.".format(self.__readable_file.path))
+                raise Exception(f"{self.__readable_file.path} was not created in time.")
             self.__readable_file.open("r")
 
         return self.__readable_file.wait_for_lines(lines)

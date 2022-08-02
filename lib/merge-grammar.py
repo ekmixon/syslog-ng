@@ -46,8 +46,8 @@ def print_to_stdout(line):
         print(line.encode("utf-8"), end='')
 
 def include_block(block_type):
-    start_marker = 'START_' + block_type
-    end_marker = 'END_' + block_type
+    start_marker = f'START_{block_type}'
+    end_marker = f'END_{block_type}'
 
     with codecs.open(grammar_file, encoding="utf-8") as f:
         in_block = False

@@ -66,19 +66,19 @@ class Loggen(object):
             start_parameters.append("--dont-parse")
 
         if read_file is not None:
-            start_parameters.append("--read-file={}".format(read_file))
+            start_parameters.append(f"--read-file={read_file}")
 
         if skip_tokens is not None:
-            start_parameters.append("--skip-tokens={}".format(skip_tokens))
+            start_parameters.append(f"--skip-tokens={skip_tokens}")
 
         if loop_reading is True:
             start_parameters.append("--loop-reading")
 
         if rate is not None:
-            start_parameters.append("--rate={}".format(rate))
+            start_parameters.append(f"--rate={rate}")
 
         if interval is not None:
-            start_parameters.append("--interval={}".format(interval))
+            start_parameters.append(f"--interval={interval}")
 
         if permanent is True:
             start_parameters.append("--permanent")
@@ -96,10 +96,10 @@ class Loggen(object):
             start_parameters.append("--no-framing")
 
         if active_connections is not None:
-            start_parameters.append("--active-connections={}".format(active_connections))
+            start_parameters.append(f"--active-connections={active_connections}")
 
         if idle_connections is not None:
-            start_parameters.append("--idle-connections={}".format(idle_connections))
+            start_parameters.append(f"--idle-connections={idle_connections}")
 
         if ipv6 is True:
             start_parameters.append("--ipv6")
@@ -108,7 +108,7 @@ class Loggen(object):
             start_parameters.append("--debug")
 
         if number is not None:
-            start_parameters.append("--number={}".format(number))
+            start_parameters.append(f"--number={number}")
 
         if csv is True:
             start_parameters.append("--csv")
@@ -117,7 +117,7 @@ class Loggen(object):
             start_parameters.append("--quiet")
 
         if size is not None:
-            start_parameters.append("--size={}".format(size))
+            start_parameters.append(f"--size={size}")
 
         if reconnect is True:
             start_parameters.append("--reconnect")
@@ -134,8 +134,14 @@ class Loggen(object):
             raise Exception("Loggen is already running, you shouldn't call start")
 
         instanceIndex = Loggen.__get_new_instance_index()
-        self.loggen_stdout_path = Path(tc_parameters.WORKING_DIR, "loggen_stdout_{}".format(instanceIndex))
-        self.loggen_stderr_path = Path(tc_parameters.WORKING_DIR, "loggen_stderr_{}".format(instanceIndex))
+        self.loggen_stdout_path = Path(
+            tc_parameters.WORKING_DIR, f"loggen_stdout_{instanceIndex}"
+        )
+
+        self.loggen_stderr_path = Path(
+            tc_parameters.WORKING_DIR, f"loggen_stderr_{instanceIndex}"
+        )
+
 
         self.parameters = self.__decode_start_parameters(
             inet, unix, stream, dgram, use_ssl, dont_parse, read_file, skip_tokens, loop_reading,
@@ -167,11 +173,8 @@ class Loggen(object):
         if not self.loggen_stderr_path.exists():
             return 0
 
-        # loggen puts the count= messages to the stderr
-        f = open(str(self.loggen_stderr_path), "r")
-        content = f.read()
-        f.close()
-
+        with open(str(self.loggen_stderr_path), "r") as f:
+            content = f.read()
         start_pattern = "count="
         if start_pattern not in content:
             return 0

@@ -36,17 +36,11 @@ def prepare_std_outputs(stdout_path, stderr_path):
 
 
 def prepare_printable_command(command):
-    printable_command = ""
-    for command_arg in command:
-        printable_command += "{} ".format(str(command_arg))
-    return printable_command
+    return "".join(f"{str(command_arg)} " for command_arg in command)
 
 
 def prepare_executable_command(command):
-    executable_command = []
-    for command_arg in command:
-        executable_command.append(str(command_arg))
-    return executable_command
+    return [str(command_arg) for command_arg in command]
 
 
 class CommandExecutor(object):
@@ -57,7 +51,7 @@ class CommandExecutor(object):
         printable_command = prepare_printable_command(command)
         executable_command = prepare_executable_command(command)
         stdout, stderr = prepare_std_outputs(stdout_path, stderr_path)
-        logger.debug("The following command will be executed:\n{}\n".format(printable_command))
+        logger.debug(f"The following command will be executed:\n{printable_command}\n")
         cmd = psutil.Popen(executable_command, stdout=stdout.open(mode="w"), stderr=stderr.open(mode="w"))
         exit_code = cmd.wait(timeout=self.__start_timeout)
 

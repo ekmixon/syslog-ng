@@ -27,16 +27,16 @@ from messagegen import syslog_prefix
 
 def file_reader(fname):
     try:
-        return open(fname + ".log", "r")
+        return open(f"{fname}.log", "r")
     except IOError as e:
-        print_user("Error opening file: %s, %s" % (fname, str(e)))
+        print_user(f"Error opening file: {fname}, {str(e)}")
 
 def sql_reader(name):
     (db, table) = name
     try:
         return os.popen("""echo "select * from %s order by msg;" | sqlite3 -separator " "  %s """ % (table, db), "r")
     except OSError as e:
-        print_user("Error opening file: %s, %s" % (fname, str(e)))
+        print_user(f"Error opening file: {fname}, {str(e)}")
 
 
 def check_contents(f, messages, syslog_prefix, skip_prefix):
@@ -69,14 +69,13 @@ def check_contents(f, messages, syslog_prefix, skip_prefix):
         msg = m.group(1)
         session = int(m.group(2))
         id = int(m.group(3))
-        if (msg, session) not in matches:
-            if id != 1:
-                print_user("the id of the first message in a session is not 1, session=%d, id=%d, file=%s:%d, line=%s"  % (session, id, f, lineno, read_line))
-                return False
-        else:
+        if (msg, session) in matches:
             if matches[(msg, session)] != id - 1:
                 print_user("message reordering/drop detected in the same session, session=%d, id=%d, expected_id=%d, file=%s:%d, line=%s" % (session, id, matches[(msg, session)]+1, f, lineno, read_line))
                 return False
+        elif id != 1:
+            print_user("the id of the first message in a session is not 1, session=%d, id=%d, file=%s:%d, line=%s"  % (session, id, f, lineno, read_line))
+            return False
         matches[(msg, session)] = id
         read_line = f.readline().strip()
         lineno = lineno + 1
@@ -91,8 +90,8 @@ def check_contents(f, messages, syslog_prefix, skip_prefix):
             return False
         del matches[(msg, session)]
 
-    if len(matches) > 0:
-        print_user("output contains more messages than expected: %s" % str(matches))
+    if matches:
+        print_user(f"output contains more messages than expected: {matches}")
         return False
 
     return True
@@ -101,10 +100,13 @@ def check_reader_expected(reader, messages, settle_time, syslog_prefix, skip_pre
     return check_contents(reader, messages, syslog_prefix, skip_prefix)
 
 def check_file_expected(fname, messages, settle_time=1, syslog_prefix=syslog_prefix, skip_prefix = 0):
-    print_user("Checking contents of output files: %s" % fname)
+    print_user(f"Checking contents of output files: {fname}")
     flush_files(settle_time)
     return check_reader_expected(file_reader(fname), messages, settle_time, syslog_prefix, skip_prefix)
 
 def check_sql_expected(dbname, tablename, messages, settle_time=1, syslog_prefix="", skip_prefix=0 ):
-    print_user("Checking contents of output database %s, table: %s" % (dbname, tablename))
+    print_user(
+        f"Checking contents of output database {dbname}, table: {tablename}"
+    )
+
     return check_reader_expected(sql_reader((dbname, tablename)), messages, settle_time, syslog_prefix, skip_prefix)

@@ -24,11 +24,11 @@ from src.syslog_ng_config.statements.filters.filter import Filter
 
 
 def render_version(version):
-    return "@version: {}\n".format(version)
+    return f"@version: {version}\n"
 
 
 def render_includes(includes):
-    include_lines = ['@include "{}"'.format(include) for include in includes]
+    include_lines = [f'@include "{include}"' for include in includes]
     return "\n".join(include_lines)
 
 
@@ -38,23 +38,21 @@ def render_global_options(global_options):
 
     config_snippet = globals_options_header
     for option_name, option_value in global_options.items():
-        config_snippet += "    {}({});\n".format(option_name, option_value)
+        config_snippet += f"    {option_name}({option_value});\n"
     config_snippet += globals_options_footer
 
     return config_snippet
 
 
 def render_positional_options(positional_parameters):
-    config_snippet = ""
-    for parameter in positional_parameters:
-        config_snippet += "        {}\n".format(str(parameter))
-    return config_snippet
+    return "".join(
+        f"        {str(parameter)}\n" for parameter in positional_parameters
+    )
 
 
 def render_options(name, options):
 
-    config_snippet = ""
-    config_snippet += "        {}(\n".format(name)
+    config_snippet = "" + f"        {name}(\n"
     config_snippet += render_driver_options(options)
     config_snippet += "        )\n"
 
@@ -62,20 +60,15 @@ def render_options(name, options):
 
 
 def render_list(name, options):
-    config_snippet = ""
-
-    for element in options:
-        config_snippet += "        {}({})\n".format(name, element)
-
-    return config_snippet
+    return "".join(f"        {name}({element})\n" for element in options)
 
 
 def render_name_value(name, value):
-    return "        {}({})\n".format(name, value)
+    return f"        {name}({value})\n"
 
 
 def render_driver(name, driver):
-    return "        {}({})\n".format(name, render_statement(driver))
+    return f"        {name}({render_statement(driver)})\n"
 
 
 def render_driver_options(driver_options):
@@ -84,7 +77,7 @@ def render_driver_options(driver_options):
     for option_name, option_value in driver_options.items():
         if isinstance(option_value, dict):
             config_snippet += render_options(option_name, option_value)
-        elif (isinstance(option_value, tuple) or isinstance(option_value, list)):
+        elif isinstance(option_value, (tuple, list)):
             config_snippet += render_list(option_name, option_value)
         elif isinstance(option_value, Filter):
             config_snippet += render_driver(option_name, option_value)
@@ -95,8 +88,7 @@ def render_driver_options(driver_options):
 
 
 def render_statement(statement):
-    config_snippet = ""
-    config_snippet += "    {} (\n".format(statement.driver_name)
+    config_snippet = "" + f"    {statement.driver_name} (\n"
     config_snippet += render_positional_options(statement.positional_parameters)
     config_snippet += render_driver_options(statement.options)
     config_snippet += "    )"
@@ -109,9 +101,10 @@ def render_statement_groups(statement_groups):
 
     for statement_group in statement_groups:
         # statement header
-        config_snippet += "\n{} {} {{\n".format(
-            statement_group.group_type, statement_group.group_id,
+        config_snippet += (
+            f"\n{statement_group.group_type} {statement_group.group_id} {{\n"
         )
+
 
         for statement in statement_group:
             # driver header
@@ -135,11 +128,10 @@ def render_logpath_groups(logpath_groups):
             if statement_group.group_type == "log":
                 config_snippet += render_logpath_groups(logpath_groups=[statement_group])
             else:
-                config_snippet += "    {}({});\n".format(
-                    statement_group.group_type, statement_group.group_id,
-                )
+                config_snippet += f"    {statement_group.group_type}({statement_group.group_id});\n"
+
         if logpath_group.flags:
-            config_snippet += "    flags({});\n".format("".join(logpath_group.flags))
+            config_snippet += f'    flags({"".join(logpath_group.flags)});\n'
         config_snippet += "};\n"
 
     return config_snippet

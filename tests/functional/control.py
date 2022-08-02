@@ -40,15 +40,9 @@ def start_syslogng(conf, keep_persist=False, verbose=False):
     if not logstore_store_supported:
         conf = re.sub('logstore\(.*\);', '', conf)
 
-    f = open('test.conf', 'w')
-    f.write(conf)
-    f.close()
-
-    if verbose:
-        verbose_opt = '-edv'
-    else:
-        verbose_opt = '-e'
-
+    with open('test.conf', 'w') as f:
+        f.write(conf)
+    verbose_opt = '-edv' if verbose else '-e'
     syslogng_pid = os.fork()
     if syslogng_pid == 0:
         os.putenv("RANDFILE", "rnd")
@@ -70,10 +64,9 @@ def stop_syslogng():
     except OSError:
         pass
     try:
-        try:
-            (pid, rc) = os.waitpid(syslogng_pid, 0)
-        except OSError:
-            raise
+        (pid, rc) = os.waitpid(syslogng_pid, 0)
+    except OSError:
+        raise
     finally:
         syslogng_pid = 0
     print_user("syslog-ng stopped")
@@ -108,7 +101,6 @@ def flush_files(settle_time=3):
 
 
 def readpidfile(pidfile):
-    f = open(pidfile, 'r')
-    pid = f.read()
-    f.close()
+    with open(pidfile, 'r') as f:
+        pid = f.read()
     return int(pid.strip())

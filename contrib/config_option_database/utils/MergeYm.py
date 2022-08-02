@@ -28,8 +28,7 @@ from sys import argv
 def get_grammar_files():
     root_dir = Path(__file__).resolve().parents[3]
     exclude = ['rewrite-expr-grammar.ym', 'native-grammar.ym']
-    files = []
-    files.extend(list((root_dir / 'modules').rglob('*.ym')))
+    files = list(list((root_dir / 'modules').rglob('*.ym')))
     files.extend(list((root_dir / 'lib').rglob('*.ym')))
     files.append(root_dir / 'lib' / 'cfg-grammar.y')
     return list(filter(lambda f: f.name not in exclude, files))
@@ -57,9 +56,7 @@ def merge_grammars(output_filepath):
 
 
 def main():
-    output_filepath = 'syslog-grammar-merged.y'
-    if len(argv) >= 2:
-        output_filepath = argv[1]
+    output_filepath = argv[1] if len(argv) >= 2 else 'syslog-grammar-merged.y'
     merge_grammars(output_filepath)
 
 

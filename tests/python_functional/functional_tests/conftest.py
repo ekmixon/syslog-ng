@@ -55,11 +55,10 @@ def pytest_runtest_setup(item):
         # relative path for working dir could be calculeted from current directory
         relative_working_dir = working_dir.relative_to(Path.cwd())
         item.user_properties.append(("relative_working_dir", relative_working_dir))
+    elif len(str(working_dir)) + len("syslog_ng_server.ctl") > 108:
+        # #define UNIX_PATH_MAX	108 (cat /usr/include/linux/un.h | grep "define UNIX_PATH_MAX)"
+        raise ValueError("Working directory lenght is too long, some socket files could not be saved, please make it shorter")
     else:
-        # relative path for working dir could not be calculeted from current directory
-        if len(str(working_dir)) + len("syslog_ng_server.ctl") > 108:
-            # #define UNIX_PATH_MAX	108 (cat /usr/include/linux/un.h | grep "define UNIX_PATH_MAX)"
-            raise ValueError("Working directory lenght is too long, some socket files could not be saved, please make it shorter")
         item.user_properties.append(("relative_working_dir", working_dir))
 
 
@@ -76,7 +75,11 @@ def setup(request):
 
     copy_file(testcase_parameters.get_testcase_file(), testcase_parameters.get_working_dir())
     light_extra_files(testcase_parameters.get_working_dir())
-    request.addfinalizer(lambda: logger.info("Report file path\n{}\n".format(calculate_report_file_path(testcase_parameters.get_working_dir()))))
+    request.addfinalizer(
+        lambda: logger.info(
+            f"Report file path\n{calculate_report_file_path(testcase_parameters.get_working_dir())}\n"
+        )
+    )
 
 
 class PortAllocator():

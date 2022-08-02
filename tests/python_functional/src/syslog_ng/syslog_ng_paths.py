@@ -45,12 +45,18 @@ class SyslogNgPaths(object):
         self.__syslog_ng_paths = {
             "dirs": {"install_dir": Path(install_dir)},
             "file_paths": {
-                "config_path": Path(working_dir, "syslog_ng_{}.conf".format(instance_name)),
-                "persist_path": Path(working_dir, "syslog_ng_{}.persist".format(instance_name)),
-                "pid_path": Path(working_dir, "syslog_ng_{}.pid".format(instance_name)),
-                "control_socket_path": Path(relative_working_dir, "syslog_ng_{}.ctl".format(instance_name)),
-                "stderr": Path(working_dir, "syslog_ng_{}_stderr".format(instance_name)),
-                "stdout": Path(working_dir, "syslog_ng_{}_stdout".format(instance_name)),
+                "config_path": Path(
+                    working_dir, f"syslog_ng_{instance_name}.conf"
+                ),
+                "persist_path": Path(
+                    working_dir, f"syslog_ng_{instance_name}.persist"
+                ),
+                "pid_path": Path(working_dir, f"syslog_ng_{instance_name}.pid"),
+                "control_socket_path": Path(
+                    relative_working_dir, f"syslog_ng_{instance_name}.ctl"
+                ),
+                "stderr": Path(working_dir, f"syslog_ng_{instance_name}_stderr"),
+                "stdout": Path(working_dir, f"syslog_ng_{instance_name}_stdout"),
             },
             "binary_file_paths": {
                 "slogkey": Path(install_dir, "bin", "slogkey"),
@@ -60,6 +66,7 @@ class SyslogNgPaths(object):
                 "loggen": Path(install_dir, "bin", "loggen"),
             },
         }
+
         return self
 
     def get_instance_name(self):
@@ -84,13 +91,13 @@ class SyslogNgPaths(object):
         return self.__syslog_ng_paths["file_paths"]["stderr"]
 
     def get_stderr_path_with_postfix(self, postfix):
-        return Path("{}_{}".format(self.__syslog_ng_paths["file_paths"]["stderr"], postfix))
+        return Path(f'{self.__syslog_ng_paths["file_paths"]["stderr"]}_{postfix}')
 
     def get_stdout_path(self):
         return self.__syslog_ng_paths["file_paths"]["stdout"]
 
     def get_stdout_path_with_postfix(self, postfix):
-        return Path("{}_{}".format(self.__syslog_ng_paths["file_paths"]["stdout"], postfix))
+        return Path(f'{self.__syslog_ng_paths["file_paths"]["stdout"]}_{postfix}')
 
     def get_syslog_ng_bin(self):
         return self.__syslog_ng_paths["binary_file_paths"]["syslog_ng_binary"]
@@ -110,8 +117,11 @@ class SyslogNgPaths(object):
     def register_external_tool_output_path(self, external_tool):
         self.__syslog_ng_paths['file_paths'].update(
             {
-                external_tool: Path(tc_parameters.WORKING_DIR, "{}_{}.log".format(external_tool, get_unique_id())),
-            },
+                external_tool: Path(
+                    tc_parameters.WORKING_DIR,
+                    f"{external_tool}_{get_unique_id()}.log",
+                )
+            }
         )
 
     def get_external_tool_output_path(self, external_tool):

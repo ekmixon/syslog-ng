@@ -47,8 +47,7 @@ class CommandLineLexer(Lexer):
         self._paren_balance = 0
 
     def token(self):
-        token = self._get_next_token()
-        return token
+        return self._get_next_token()
 
     def get_position(self):
         return self._current_position
@@ -89,7 +88,7 @@ class CommandLineLexer(Lexer):
             self._current_position += 1
 
     def _process_normal_character(self, current_char):
-        if current_char == '"' or current_char == "'":
+        if current_char in ['"', "'"]:
             return self._open_quoted_string(current_char)
         elif current_char.isspace():
             return self._close_current_token(current_char)

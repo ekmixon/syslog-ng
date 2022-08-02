@@ -30,7 +30,7 @@ def test_internal_source_with_threaded_destination(config, syslog_ng):
     syslog_ng.start(config, stderr=False, debug=True, trace=False, verbose=False)
     assert example_destination.read_until_logs(["syslog-ng starting up"])
 
-    for _ in range(0, 5):
+    for _ in range(5):
         syslog_ng.reload(config)
         assert example_destination.read_until_logs(["Configuration reload finished"])
 

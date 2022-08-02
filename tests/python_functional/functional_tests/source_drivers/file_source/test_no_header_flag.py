@@ -39,6 +39,7 @@ def test_no_header_flag(config, syslog_ng, log_message, bsd_formatter):
         log_message.pid_value,
         log_message.message_value,
     )
-    full_expected_message = "<{}>{}".format(log_message.priority_value, expected_msg_value_for_no_header_flag)
+    full_expected_message = f"<{log_message.priority_value}>{expected_msg_value_for_no_header_flag}"
+
 
     assert file_destination.read_log() == full_expected_message

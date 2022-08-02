@@ -51,7 +51,7 @@ def main():
     if args.raw:
         print(next_pr_id)
     else:
-        print("The next PR ID will be {}.".format(next_pr_id))
+        print(f"The next PR ID will be {next_pr_id}.")
 
 
 if __name__ == "__main__":

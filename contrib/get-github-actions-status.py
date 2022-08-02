@@ -8,7 +8,8 @@ from time import sleep
 
 
 def get_workflow_runs(workflow):
-    url = "https://api.github.com/repos/syslog-ng/syslog-ng/actions/workflows/{}.yml/runs?branch=master".format(workflow)
+    url = f"https://api.github.com/repos/syslog-ng/syslog-ng/actions/workflows/{workflow}.yml/runs?branch=master"
+
     request = urllib.request.Request(url, None, {})
     try:
         with urllib.request.urlopen(request) as response:
@@ -42,7 +43,7 @@ def main():
         print('"' + latest_run["name"] + '" job finished.')
         print("Date: " + latest_run["updated_at"])
         print("URL: " + latest_run["html_url"])
-        print("Result: " + result)
+        print(f"Result: {result}")
 
         if result == "success":
             sys.exit(0)

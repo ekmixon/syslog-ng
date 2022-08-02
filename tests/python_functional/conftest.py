@@ -92,7 +92,7 @@ def pytest_collection_modifyitems(config, items):
 
 def pytest_runtest_logreport(report):
     if report.outcome == "failed":
-        logger.error("\n{}".format(report.longrepr))
+        logger.error(f"\n{report.longrepr}")
 
 
 # Pytest Fixtures

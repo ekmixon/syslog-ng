@@ -29,7 +29,7 @@ options {
     mark-mode(`disable`);
 };
 """
-    raw_config = "@version: {}\n".format(config.get_version()) + raw_config
+    raw_config = f"@version: {config.get_version()}\n" + raw_config
     config.set_raw_config(raw_config)
 
     syslog_ng.start(config)

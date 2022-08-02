@@ -15,7 +15,10 @@ arcs = j["arcs"]
 
 print("digraph D {")
 for node in nodes:
-    print("  Node{} [label=\"{} {}\"]".format(node["node"], node["node"], ", ".join(node["info"])))
+    print(
+        f'  Node{node["node"]} [label=\"{node["node"]} {", ".join(node["info"])}\"]'
+    )
+
 for arc in arcs:
-    print("  Node{} -> Node{} [label=\"{}\"]".format(arc["from"], arc["to"], arc["type"]))
+    print(f'  Node{arc["from"]} -> Node{arc["to"]} [label=\"{arc["type"]}\"]')
 print("}")

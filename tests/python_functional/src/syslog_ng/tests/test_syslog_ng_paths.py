@@ -52,13 +52,13 @@ def test_syslog_ng_paths_parent_class_of_paths(fake_testcase_parameters):
     syslog_ng_paths = SyslogNgPaths(fake_testcase_parameters)
     syslog_ng_paths.set_syslog_ng_paths(instance_name="server")
     for __key, value in syslog_ng_paths._SyslogNgPaths__syslog_ng_paths["file_paths"].items():
-        assert isinstance(value, PosixPath) is True
+        assert isinstance(value, PosixPath)
 
     for __key, value in syslog_ng_paths._SyslogNgPaths__syslog_ng_paths["dirs"].items():
-        assert isinstance(value, PosixPath) is True
+        assert isinstance(value, PosixPath)
 
     for __key, value in syslog_ng_paths._SyslogNgPaths__syslog_ng_paths["binary_file_paths"].items():
-        assert isinstance(value, PosixPath) is True
+        assert isinstance(value, PosixPath)
 
 
 def test_syslog_ng_paths_client_relay_server(fake_testcase_parameters):

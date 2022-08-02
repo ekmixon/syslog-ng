@@ -81,15 +81,15 @@ def test_facility_single():
     expected = [None,] * len(messages)
 
     s = SocketSender(AF_UNIX, 'log-stream', dgram=0, repeat=10)
-    for ndx in range(0, len(messages)):
+    for ndx in range(len(messages)):
         if not expected[ndx]:
             expected[ndx] = []
         expected[ndx].extend(s.sendMessages(messages[ndx][1], pri=messages[ndx][0]))
 
-    for ndx in range(0, len(messages)):
-        if not check_file_expected('test-facility%d' % (ndx + 1,), expected[ndx]):
-            return False
-    return True
+    return all(
+        check_file_expected('test-facility%d' % (ndx + 1,), expected[ndx])
+        for ndx in range(len(messages))
+    )
 
 def test_facility_multi():
     messages = (
@@ -100,12 +100,10 @@ def test_facility_multi():
     expected = []
 
     s = SocketSender(AF_UNIX, 'log-stream', dgram=0, repeat=10)
-    for ndx in range(0, len(messages)):
+    for ndx in range(len(messages)):
         expected.extend(s.sendMessages(messages[ndx][1], pri=messages[ndx][0]))
 
-    if not check_file_expected('test-facility4', expected):
-        return False
-    return True
+    return bool(check_file_expected('test-facility4', expected))
 
 
 def test_level_single():
@@ -117,15 +115,15 @@ def test_level_single():
     expected = [None,] * len(messages)
 
     s = SocketSender(AF_UNIX, 'log-stream', dgram=0, repeat=10)
-    for ndx in range(0, len(messages)):
+    for ndx in range(len(messages)):
         if not expected[ndx]:
             expected[ndx] = []
         expected[ndx].extend(s.sendMessages(messages[ndx][1], pri=messages[ndx][0]))
 
-    for ndx in range(0, len(messages)):
-        if not check_file_expected('test-level%d' % (ndx + 1,), expected[ndx]):
-            return False
-    return True
+    return all(
+        check_file_expected('test-level%d' % (ndx + 1,), expected[ndx])
+        for ndx in range(len(messages))
+    )
 
 def test_level_multi():
     messages = (
@@ -136,9 +134,7 @@ def test_level_multi():
     expected = []
 
     s = SocketSender(AF_UNIX, 'log-stream', dgram=0, repeat=10)
-    for ndx in range(0, len(messages)):
+    for ndx in range(len(messages)):
         expected.extend(s.sendMessages(messages[ndx][1], pri=messages[ndx][0]))
 
-    if not check_file_expected('test-level4', expected):
-        return False
-    return True
+    return bool(check_file_expected('test-level4', expected))

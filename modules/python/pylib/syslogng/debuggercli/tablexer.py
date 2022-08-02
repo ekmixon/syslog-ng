@@ -44,10 +44,7 @@ class TabLexer(Lexer):
         return self._replaced_token
 
     def set_drop_last_token(self, value):
-        if value:
-            self._buffer_count = 1
-        else:
-            self._buffer_count = 0
+        self._buffer_count = 1 if value else 0
 
     def token(self):
         if self._end_of_tokens:

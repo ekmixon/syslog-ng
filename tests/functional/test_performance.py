@@ -45,7 +45,7 @@ def test_performance():
     print_user("Starting loggen for 10 seconds")
     out = os.popen("../loggen/loggen --quiet --stream --inet --rate 1000000 --size 160 --interval 10 --active-connections 1 127.0.0.1 %d 2>&1 |tail -n +1" % port_number, 'r').read()
 
-    print_user("performance: %s" % out)
+    print_user(f"performance: {out}")
     rate = float(re.sub('^.*rate = ([0-9.]+).*$', '\\1', out))
 
     hostname = os.uname()[1]
